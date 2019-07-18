@@ -29,18 +29,15 @@ void KalmanFilter::Predict() {
   /**
    * TODO: predict the state
    */
-   cout << "Begin prediction" << endl;
    x_ = F_ * x_;
    MatrixXd Ft = F_.transpose();
    P_ = F_ * P_ * Ft + Q_;
-   cout << "End prediction" << endl;
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
   /**
    * TODO: update the state by using Kalman Filter equations
    */
-   cout << "Begin kalman update" << endl;
    VectorXd y = z - H_ * x_;
 
    MatrixXd Ht = H_.transpose();
@@ -54,7 +51,6 @@ void KalmanFilter::Update(const VectorXd &z) {
    // new state
    x_ = x_ + (K * y);
    P_ = (I_ - (K * H_)) * P_;
-   cout << "End kalman update" << endl;
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
@@ -62,7 +58,6 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
    * TODO: update the state by using Extended Kalman Filter equations
    */
    //h(x) function:
-   cout << "begin ekf update" << endl;
    float px = x_(0);
    float py = x_(1);
    float vx = x_(2);
@@ -88,27 +83,15 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
    for (int i=0; y(1) < -M_PI; y(1) += 2*M_PI) {
 
    }
-   cout << "begin jacobian" << endl;
    MatrixXd Hj = tools.CalculateJacobian(x_);
    MatrixXd Hjt = Hj.transpose();
-   cout << "begin S calc" << endl;
-   MatrixXd S1 = Hj * P_;
-   cout << "check 1" << endl;
-   MatrixXd S2 = S1 * Hjt;
-   cout << "check 2" << endl;
-   cout << R_ << endl;
-   MatrixXd S = S2 + R_;
-   cout << "check 3" << endl;
-
-
+   MatrixXd S =  Hj * P_ * Hjt + R_;
    MatrixXd Si = S.inverse();
-   cout << "begin K calc" << endl;
    MatrixXd K =  P_ * Hjt * Si;
-   cout << "begin I calc" << endl;
+
    MatrixXd I_ = MatrixXd::Identity(x_.size(), x_.size());
    // new state
-   cout << "begin state update" << endl;
    x_ = x_ + (K * y);
    P_ = (I_ - (K * Hj)) * P_;
-   cout << "end ekf update" << endl;
+
 }
