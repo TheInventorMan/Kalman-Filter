@@ -18,10 +18,10 @@ FusionEKF::FusionEKF() {
   previous_timestamp_ = 0;
 
   // initializing matrices
-  R_laser_ = MatrixXd(2, 2);
-  R_radar_ = MatrixXd(3, 3);
-  H_laser_ = MatrixXd(2, 4);
-  H_radar_ = MatrixXd(4, 4);
+  MatrixXd R_laser_(2, 2);
+  MatrixXd R_radar_(3, 3);
+  MatrixXd H_laser_(2, 4);
+  MatrixXd H_radar_(4, 4);
 
   //measurement covariance matrix - laser
   R_laser_ << 0.0225, 0,
@@ -39,10 +39,10 @@ FusionEKF::FusionEKF() {
    * TODO: Set the process and measurement noises
    */
 
-   x_ = VectorXd(4);
-   F_ = MatrixXd(4,4);
-   P_ = MatrixXd(4,4);
-   Q_ = MatrixXd(4,4);
+   VectorXd x_(4);
+   MatrixXd F_(4,4);
+   MatrixXd P_(4,4);
+   MatrixXd Q_(4,4);
 
    x_ << 0.0, 0.0, 0.0, 0.0;
 
@@ -97,10 +97,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       float vx = rho_dot * cos(phi);
       float vy = rho_dot * sin(phi);
 
-      ekf.x_ << px, py, vx, vy;
+      ekf_.x_ << px, py, vx, vy;
 
       //high certainty about position and velocity
-      ekf.P_ << 1.0, 0.0, 0.0, 0.0,
+      ekf_.P_ << 1.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0,
                 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 1.0;
@@ -114,7 +114,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       ekf_.x_ << px, py, 0.0, 0.0;
 
       //no information about velocity
-      ekf.P_ << 1.0, 0.0, 0.0, 0.0,
+      ekf_.P_ << 1.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 0.0,
                 0.0, 0.0, 100.0, 0.0,
                 0.0, 0.0, 0.0, 100.0;
@@ -128,7 +128,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   /**
    * Prediction
    */
-   double dt = (measurement_pack.timestamp_ - previous_timestamp_)/1000000
+   double dt = (measurement_pack.timestamp_ - previous_timestamp_)/1000000;
    previous_timestamp_ = measurement_pack.timestamp_;
 
    ekf_.F_(0, 2) = dt;
@@ -167,11 +167,11 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // TODO: Radar updates
     ekf_.R_ = R_radar_;
-    ekf_.UpdateEKF(measurement_pack.raw_measurements_)
+    ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } else {
     // TODO: Laser updates
     ekf_.R_ = R_laser_;
-    ekf_.Update(measurement_pack.raw_measurements_)
+    ekf_.Update(measurement_pack.raw_measurements_);
   }
 
   // print the output
