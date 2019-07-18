@@ -38,8 +38,6 @@ FusionEKF::FusionEKF() {
    * TODO: Finish initializing the FusionEKF.
    * TODO: Set the process and measurement noises
    */
-   float noise_ax = 9.0;
-   float noise_ay = 9.0;
 
    x_ = VectorXd(4);
    F_ = MatrixXd(4,4);
@@ -140,8 +138,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    double dt3 = dt2*dt/2;
    double dt4 = dt2*dt2/4;
 
-   double nx = noise_ax;
-   double ny = noise_ay;
+   double nx = 9.0; //noise_ax
+   double ny = 9.0; //noise_ay
 
    ekf_.Q_ << dt4*nx, 0.0, dt3*nx, 0.0,
               0.0, dt4*ny, 0.0, dt3*ny,
