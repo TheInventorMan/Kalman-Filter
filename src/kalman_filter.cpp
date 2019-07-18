@@ -26,18 +26,16 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 }
 
 void KalmanFilter::Predict() {
-  /**
-   * TODO: predict the state
-   */
+
+  // Initial state prediction
    x_ = F_ * x_;
    MatrixXd Ft = F_.transpose();
    P_ = F_ * P_ * Ft + Q_;
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
-  /**
-   * TODO: update the state by using Kalman Filter equations
-   */
+
+  // Update using regular kalman equations.
    VectorXd y = z - H_ * x_;
 
    MatrixXd Ht = H_.transpose();
@@ -48,16 +46,14 @@ void KalmanFilter::Update(const VectorXd &z) {
 
    MatrixXd I_ = MatrixXd::Identity(x_.size(), x_.size());
 
-   // new state
+   // New state
    x_ = x_ + (K * y);
    P_ = (I_ - (K * H_)) * P_;
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
-  /**
-   * TODO: update the state by using Extended Kalman Filter equations
-   */
-   //h(x) function:
+
+   // Define h(x) function:
    float px = x_(0);
    float py = x_(1);
    float vx = x_(2);
@@ -75,14 +71,17 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
    VectorXd hx(3);
    hx << rho, phi, rho_dot;
 
+   // Update using on EKF equations.
    VectorXd y = z - hx;
 
-   for (int i=0; y(1) > M_PI;  y(1) -= 2*M_PI) {
+   // Bound angle to be between -pi and +pi.
+   for (; y(1) > M_PI;  y(1) -= 2*M_PI) {
 
    }
-   for (int i=0; y(1) < -M_PI; y(1) += 2*M_PI) {
+   for (; y(1) < -M_PI; y(1) += 2*M_PI) {
 
    }
+
    MatrixXd Hj = tools.CalculateJacobian(x_);
    MatrixXd Hjt = Hj.transpose();
    MatrixXd S =  Hj * P_ * Hjt + R_;
@@ -90,7 +89,8 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
    MatrixXd K =  P_ * Hjt * Si;
 
    MatrixXd I_ = MatrixXd::Identity(x_.size(), x_.size());
-   // new state
+
+   // New state
    x_ = x_ + (K * y);
    P_ = (I_ - (K * Hj)) * P_;
 
